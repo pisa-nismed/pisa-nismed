@@ -1,5 +1,6 @@
 <template>
   <div>
+    <title>NISMED PISA-like Assessment Items</title>
     <h1>Welcome, {{ user.email }}</h1>
     <button @click="logout">Logout</button>
   </div>
