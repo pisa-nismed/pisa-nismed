@@ -1,60 +1,67 @@
-import axios from 'axios';
+import { defineStore } from 'pinia';
+import pb from '../services/pocketbase';
 
-const API_URL = 'https://pisa-nismed.pockethost.io'; // Replace with your PocketHost API URL
+// Pinia store to manage user authentication state (logged in or not)
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
+    user: null,
+    isLoading: false,
+    error: null,
+  }),
 
-export const authService = {
-  // Register a new user
-  async register(email, password) {
-    try {
-      const response = await axios.post(`${API_URL}/api/collections/users/records`, {
-        email,
-        password,
-      });
-      return response.data; // Return the response data (user data)
-    } catch (error) {
-      throw new Error(error.response?.data?.message || 'Registration failed');
-    }
-  },
-
-  // Login user with email and password
-  async login(email, password) {
-    try {
-      const response = await axios.post(`${API_URL}/api/collections/users/auth-with-password`, {
-        identity: email,
-        password,
-      });
-      localStorage.setItem('auth_token', response.data.token); // Store token in localStorage
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.message || 'Login failed');
-    }
-  },
-
-  // Logout user
-  async logout() {
-    try {
-      const token = localStorage.getItem('auth_token');
-      if (token) {
-        await axios.post(`${API_URL}/api/collections/users/auth-logout`, {}, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        localStorage.removeItem('auth_token');
+  actions: {
+    async login(email, password) {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        // Log in the user using Pocketbase
+        const loggedInUser = await pb.auth.login(email, password);  // Correct login method
+        this.user = loggedInUser;  // Store user object after login
+      } catch (err) {
+        this.error = err;  // Show error from Pocketbase
+      } finally {
+        this.isLoading = false;
       }
-    } catch (error) {
-      console.error('Logout error', error);
-    }
-  },
+    },
 
-  // Get the current authenticated user
-  async getCurrentUser() {
-    try {
-      const token = localStorage.getItem('auth_token');
-      const response = await axios.get(`${API_URL}/api/collections/users/auth-me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch current user');
-    }
+    async register(email, password) {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        // Register the user using pb.auth.createUser
+        const user = await pb.collection('users').create({
+          email: email,
+          password: password,
+        });
+
+        // Optionally, send a verification email (if needed)
+        await pb.collection('users').requestVerification(user.email);
+
+        this.user = user;  // Store the newly registered user
+      } catch (err) {
+        this.error = err;  // Show error from Pocketbase
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async logout() {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        // Log out the current user
+        await pb.auth.logout();  // Correct logout method
+        this.user = null;  // Clear user data on logout
+      } catch (err) {
+        this.error = err;  // Show error from Pocketbase
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    checkUser() {
+      // Check if a user is logged in when the app starts
+      this.user = pb.authStore.model;  // This fetches the currently authenticated user from Pocketbase
+    },
   },
-};
+});

@@ -1,17 +1,28 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Register from '../components/Register.vue';
-import Login from '../components/Login.vue';
-import HelloWorld from '../components/HelloWorld.vue';
+import { useAuthStore } from '../stores/authStore';
+import LoginPage from '../components/LoginPage.vue';
+import RegistrationPage from '../components/RegistrationPage.vue';
+import HomePage from '../components/HomePage.vue';
 
 const routes = [
-  { path: '/register', component: Register },
-  { path: '/login', component: Login },
   {
-    path: '/hello-world',
-    component: HelloWorld,
-    meta: { requiresAuth: true }, // Protect this route
+    path: '/',
+    name: 'home',
+    component: HomePage,
+    meta: { requiresAuth: true },
   },
-  { path: '/', redirect: '/login' }, // Default redirect to login
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginPage,
+    meta: { requiresAuth: false },
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: RegistrationPage,
+    meta: { requiresAuth: false },
+  },
 ];
 
 const router = createRouter({
@@ -19,14 +30,15 @@ const router = createRouter({
   routes,
 });
 
-// Global navigation guard
+// Route Guard to check if the user is authenticated
 router.beforeEach((to, from, next) => {
-  const user = JSON.parse(localStorage.getItem('user')); // Retrieve user from localStorage
+  const authStore = useAuthStore();
+  authStore.checkAuth();
 
-  if (to.meta.requiresAuth && !user) {
-    next('/login'); // Redirect to login if not authenticated
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+    next({ name: 'login' });
   } else {
-    next(); // Allow navigation
+    next();
   }
 });
 
