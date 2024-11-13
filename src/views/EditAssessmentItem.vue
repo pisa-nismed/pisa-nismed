@@ -1,17 +1,27 @@
 <template>
   <div class="flex items-center justify-center min-h-screen bg-gray-100">
     <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-lg">
+      <router-link to="/">
+        <button class="bg-green-500 text-white rounded-md p-2 hover:bg-green-600 transition">
+          Home
+        </button>
+      </router-link>
+      <router-link to="/items">
+        <button class="bg-green-500 text-white rounded-md p-2 hover:bg-green-600 transition">
+          View All Assessment Items
+        </button>
+      </router-link>
       <h1 class="text-2xl font-bold mb-6 text-center">Edit Assessment Item</h1>
       <form @submit.prevent="submitForm">
         <div class="mb-4">
           <label for="text" class="block text-sm font-medium mb-1">Question Text</label>
-          <input
+          <textarea
             v-model="form.text"
             id="text"
-            type="text"
             required
             class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300"
-          />
+            rows="4"
+          ></textarea>
         </div>
 
         <div class="mb-4">
@@ -23,7 +33,7 @@
             class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300"
           >
             <option value="mul_cho_one">Multiple Choice (One Answer)</option>
-            <option value="mul_cho_may">Multiple Choice (Many Answers)</option>
+            <option value="mul_cho_many">Multiple Choice (Many Answers)</option>
             <option value="short_answer">Short Answer</option>
             <option value="specific_answer">Specific Number or Word</option>
           </select>
@@ -37,7 +47,7 @@
             required
             class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300"
           ></textarea>
-          <small class="text-gray-500">Example: [{"text": "Option 1", "is_correct": true}, {"text": "Option 2", "is_correct": false}]</small>
+          <small class="text-gray-500">Example: [{"option_no": 1, "text": "Option 1", "is_correct": true}, {"option_no": 2, "text": "Option 2", "is_correct": false}]</small>
         </div>
 
         <div class="mb-4">
@@ -61,85 +71,79 @@
           ></textarea>
         </div>
 
-        <div class="flex space-x-4">
-          <button
-            type="submit"
-            class="flex-1 bg-blue-500 text-white rounded-md p-2 hover:bg-blue-600 transition"
-          >
-            Update Item
-          </button>
-          <button
-            type="button"
-            @click="deleteItem"
-            class="flex-1 bg-red-500 text-white rounded-md p-2 hover:bg-red-600 transition"
-          >
-            Delete Item
-          </button>
-        </div>
+        <button
+          type="submit"
+          class="w-full bg-blue-500 text-white rounded-md p-2 hover:bg-blue-600 transition"
+        >
+          Update
+        </button>
+        <button
+          type="button"
+          @click="deleteItem"
+          class="mt-2 w-full bg-red-500 text-white rounded-md p-2 hover:bg-red-600 transition"
+        >
+          Delete Item
+        </button>
       </form>
     </div>
   </div>
 </template>
 
-
 <script>
 import { useAssessmentItemsStore } from '../stores/assessmentItems';
 import { useRoute, useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
 
 export default {
-  data() {
-    return {
-      form: {
-        text: '',
-        type: '',
-        choices: '',
-        answer: '',
-        explanation: '',
-      },
-    };
-  },
-  async created() {
+  setup() {
     const store = useAssessmentItemsStore();
     const route = useRoute();
+    const router = useRouter();
+    const form = ref({
+      text: '',
+      type: '',
+      choices: '',
+      answer: '',
+      explanation: '',
+    });
+
     const itemId = route.params.id;
-    const item = store.items.find(item => item.id === itemId);
 
-    if (item) {
-      this.form = {
-        text: item.text,
-        type: item.type,
-        choices: JSON.stringify(item.choices),
-        answer: item.answer,
-        explanation: item.explanation,
-      };
-    } else {
-      // Handle case when the item is not found (e.g., redirect to list page)
-      this.$router.push('/');
-    }
-  },
-  methods: {
-    async submitForm() {
-      const store = useAssessmentItemsStore();
-      const route = useRoute();
-      const itemId = route.params.id;
-      const formData = {
-        text: this.form.text,
-        type: this.form.type,
-        choices: JSON.parse(this.form.choices),
-        answer: this.form.answer,
-        explanation: this.form.explanation,
-      };
-      await store.updateItem(itemId, formData);
-      this.$router.push('/'); // Redirect to the list page after updating the item
-    },
+    onMounted(async () => {
+      await store.fetchItems();
+      const item = store.items.find(item => item.id === itemId);
 
-    async deleteItem() {
-      const store = useAssessmentItemsStore();
-      const route = useRoute();
-      const itemId = route.params.id;
+      if (item) {
+        form.value = {
+          text: item.text,
+          type: item.type,
+          choices: JSON.stringify(item.choices),
+          answer: item.answer,
+          explanation: item.explanation,
+        };
+      } else {
+        router.push('/');
+      }
+    });
+
+    const submitForm = async () => {
+      const updatedData = {
+        text: form.value.text,
+        type: form.value.type,
+        choices: JSON.parse(form.value.choices),
+        answer: form.value.answer,
+        explanation: form.value.explanation,
+      };
+      await store.updateItem(itemId, updatedData);
+      router.push('/'); // Redirect to the list page after updating the item
+    };
+
+    const deleteItem = async () => {
       await store.deleteItem(itemId);
-      this.$router.push('/'); // Redirect to the list page after deleting the item
-    },
+      router.push('/'); // Redirect to the list page after deleting the item
+    };
+
+    return { form, submitForm, deleteItem };
   },
 };
 </script>

@@ -1,17 +1,29 @@
 <template>
   <div class="flex items-center justify-center min-h-screen bg-gray-100">
     <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-lg">
+      <router-link to="/">
+        <button class="bg-green-500 text-white rounded-md p-2 hover:bg-green-600 transition">
+          Home
+        </button>
+      </router-link>
+      <router-link to="/items">
+        <button class="bg-green-500 text-white rounded-md p-2 hover:bg-green-600 transition">
+          View All Assessment Items
+        </button>
+      </router-link>
+
       <h1 class="text-2xl font-bold mb-6 text-center">Create Assessment Item</h1>
       <form @submit.prevent="submitForm">
         <div class="mb-4">
           <label for="text" class="block text-sm font-medium mb-1">Question Text</label>
-          <input
-            v-model="form.text"
-            id="text"
-            type="text"
-            required
-            class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300"
-          />
+          <textarea
+        v-model="form.text"
+        id="text"
+        required
+        class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300"
+        rows="4"
+          >
+          </textarea>
         </div>
 
         <div class="mb-4">
@@ -100,7 +112,7 @@ export default {
       };
       await store.createItem(formData);
       this.$router.push('/'); // Redirect to the list page after creating the item
-    },
+    }
   },
 };
 </script>
