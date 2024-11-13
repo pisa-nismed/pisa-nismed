@@ -36,6 +36,11 @@
     <div v-if="item.type === 'specific_answer'" class="specific-answer">
       <p>Answer can be a specific number or word.</p>
     </div>
+    
+    <div class="answer">
+      <h4>Answer:</h4>
+      <p v-html="item.answer"></p>
+    </div>
 
     <div class="explanation">
       <h4>Explanation:</h4>

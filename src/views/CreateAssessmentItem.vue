@@ -1,6 +1,8 @@
 <template>
   <div class="flex items-center justify-center min-h-screen bg-gray-100">
     <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-lg">
+      <!-- Button container to align buttons in a row -->
+      <div class="flex space-x-4 mb-4">
       <router-link to="/">
         <button class="bg-green-500 text-white rounded-md p-2 hover:bg-green-600 transition">
           Home
@@ -11,7 +13,7 @@
           View All Assessment Items
         </button>
       </router-link>
-
+      </div>
       <h1 class="text-2xl font-bold mb-6 text-center">Create Assessment Item</h1>
       <form @submit.prevent="submitForm">
         <div class="mb-4">
