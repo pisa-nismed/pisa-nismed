@@ -4,6 +4,11 @@ import LoginPage from '../views/LoginPage.vue';
 import RegistrationPage from '../views/RegistrationPage.vue';
 import HomePage from '../views/HomePage.vue';
 
+import ListAssessmentItems from '../views/ListAssessmentItems.vue';
+import CreateAssessmentItem from '../views/CreateAssessmentItem.vue';
+import EditAssessmentItem from '../views/EditAssessmentItem.vue';
+
+
 const routes = [
   {
     path: '/',
@@ -22,6 +27,25 @@ const routes = [
     name: 'register',
     component: RegistrationPage,
     meta: { requiresAuth: false },
+  },
+  
+  {
+    path: '/create',
+    name: 'create-assessment',
+    component: CreateAssessmentItem,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/edit/:id',
+    name: 'edit-assessment',
+    component: EditAssessmentItem,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/items',
+    name: 'view-assessments',
+    component: ListAssessmentItems,
+    meta: { requiresAuth: true },
   },
 ];
 
