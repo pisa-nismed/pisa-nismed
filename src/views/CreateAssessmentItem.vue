@@ -37,7 +37,7 @@
             required
             class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300"
           ></textarea>
-          <small class="text-gray-500">Example: [{"text": "Option 1", "is_correct": true}, {"text": "Option 2", "is_correct": false}]</small>
+          <small class="text-gray-500">Example: [{"option_no": 1, "text": "Option 1", "is_correct": true}, {"option_no": 2, "text": "Option 2", "is_correct": false}]</small>
         </div>
 
         <div class="mb-4">
