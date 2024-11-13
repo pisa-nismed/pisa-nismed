@@ -2,6 +2,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import { createPinia } from 'pinia';  // Import Pinia
 import router from './router'; // Vue Router instance
+import './style.css';
 
 // Create a new Vue app
 const app = createApp(App);

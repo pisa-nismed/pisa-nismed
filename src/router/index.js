@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '../stores/authStore';
-import LoginPage from '../components/LoginPage.vue';
-import RegistrationPage from '../components/RegistrationPage.vue';
-import HomePage from '../components/HomePage.vue';
+import LoginPage from '../views/LoginPage.vue';
+import RegistrationPage from '../views/RegistrationPage.vue';
+import HomePage from '../views/HomePage.vue';
 
 const routes = [
   {
